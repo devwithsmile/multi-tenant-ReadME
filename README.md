@@ -17,8 +17,6 @@
 
 ## 1. System Overview
 
-FineEdge is a SaaS product offered to banks on a subscription basis. Multiple banks (tenants) share the same application and database. Each bank purchases access to specific microservices.
-
 ### Microservices
 
 | Service | Default Access | Requires Subscription |
@@ -37,7 +35,7 @@ FineEdge is a SaaS product offered to banks on a subscription basis. Multiple ba
 
 | State | Access |
 |---|---|
-| Trial (within date range) | All MSs — dates set manually per tenant by FineEdge admin |
+| Trial (within date range) | All MSs — dates set manually per tenant by admin |
 | Trial expired, no subscription | No access to paid MSs |
 | Active subscription | Only subscribed MSs, for subscribed period |
 | Subscription expired | No access until renewed |
@@ -113,7 +111,7 @@ Gateway → Microservice        :  JWS  (signed, HMAC)
 
 ## 4. Tenant & License Model
 
-FineEdge admin issues a license to a bank through a single form. No API key needed — the **email domain is the license identifier**.
+admin issues a license to a bank through a single form. No API key needed — the **email domain is the license identifier**.
 
 ### License Issuance Form
 
@@ -166,7 +164,7 @@ license_services (
 ### License Lifecycle
 
 ```
-FineEdge Admin creates tenant
+Admin creates tenant
          │
          ▼
 License record created  (TRIAL or SUBSCRIPTION)
@@ -352,7 +350,7 @@ public class TenantFilterInterceptor implements HandlerInterceptor {
 
         String role = (String) request.getAttribute("role");
 
-        // FineEdge staff see all tenants — no filter
+        //staff see all tenants — no filter
         if ("_ADMIN".equals(role) || "SUPER_ADMIN".equals(role)) {
             return true;
         }
