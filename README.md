@@ -1,4 +1,4 @@
-# FineEdge — Subscription & Multi-Tenancy Architecture
+#Multi-Tenancy Architecture
 
 ## Table of Contents
 1. [System Overview](#1-system-overview)
@@ -50,10 +50,10 @@ FineEdge is a SaaS product offered to banks on a subscription basis. Multiple ba
 
 ```
 ┌─────────────────────────────────────────────────┐
-│                  FINEDGE SIDE                   │
+│                   SIDE                   │
 │                                                 │
 │  SUPER_ADMIN      — founder/owner level         │
-│  FINEDGE_ADMIN    — ops team, creates tenants   │
+│  _ADMIN    — ops team, creates tenants   │
 │                     and issues licenses         │
 └─────────────────────────────────────────────────┘
 
@@ -71,7 +71,7 @@ FineEdge is a SaaS product offered to banks on a subscription basis. Multiple ba
 | Role | tenantId in JWS | Scope |
 |---|---|---|
 | SUPER_ADMIN | ❌ None | All tenants |
-| FINEDGE_ADMIN | ❌ None | All tenants |
+| _ADMIN | ❌ None | All tenants |
 | BANK_ADMIN | ✅ Yes | Own tenant only |
 | BANK_USER | ✅ Yes | Own tenant only |
 
@@ -107,7 +107,7 @@ Gateway → Microservice        :  JWS  (signed, HMAC)
 }
 ```
 
-`tid` is the `tenantId`. SUPER_ADMIN and FINEDGE_ADMIN tokens omit `tid`.
+`tid` is the `tenantId`. SUPER_ADMIN and _ADMIN tokens omit `tid`.
 
 ---
 
@@ -139,7 +139,7 @@ tenant (
   admin_email      VARCHAR,
   status           ENUM('ACTIVE', 'INACTIVE', 'SUSPENDED'),
   created_at       TIMESTAMP,
-  created_by       UUID                  -- finedge admin who created this
+  created_by       UUID                  --  admin who created this
 )
 
 license (
@@ -195,7 +195,7 @@ GET  /internal/access?tenantId=X&service=banking-service
 # Called by frontend after login
 GET  /subscriptions/me
 
-# Called by admin-service / finedge admin operations
+# Called by admin-service /  admin operations
 POST /internal/subscriptions/trial
 POST /subscriptions
 PUT  /subscriptions/{id}/renew
@@ -353,7 +353,7 @@ public class TenantFilterInterceptor implements HandlerInterceptor {
         String role = (String) request.getAttribute("role");
 
         // FineEdge staff see all tenants — no filter
-        if ("FINEDGE_ADMIN".equals(role) || "SUPER_ADMIN".equals(role)) {
+        if ("_ADMIN".equals(role) || "SUPER_ADMIN".equals(role)) {
             return true;
         }
 
@@ -558,11 +558,11 @@ Client      Gateway     Redis       Sub-Service    Banking-Service
 | Component | Change |
 |---|---|
 | **auth-service** | Add `tid` (tenantId) to JWS claims at token issuance. Add domain → tenant lookup at login. |
-| **finedge-common JwtValidator** | Add `getTenantId()` method to extract `tid` claim. |
+| **-common JwtValidator** | Add `getTenantId()` method to extract `tid` claim. |
 | **API Gateway** | Add `SubscriptionFilter` at end of `AuthenticationFilterChain`. |
 | **Each microservice JwtFilter** | Set `tenantId` and `role` as request attributes after claim extraction. |
-| **finedge-common BaseEntity** | Add `tenantId` field + `@FilterDef` + `@Filter` annotations. |
-| **Each microservice** | Add `TenantFilterInterceptor` (can live in `finedge-common`, auto-configured). |
+| **-common BaseEntity** | Add `tenantId` field + `@FilterDef` + `@Filter` annotations. |
+| **Each microservice** | Add `TenantFilterInterceptor` (can live in `-common`, auto-configured). |
 | **admin-service** | Add user creation endpoint with pessimistic lock + license limit check. |
 | **subscription-service** | New service, isolated DB, owns tenant/license/license_services tables. |
 | **Redis** | New key pattern: `sub:{tenantId}:{serviceName}` |
