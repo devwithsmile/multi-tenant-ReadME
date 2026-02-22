@@ -48,7 +48,7 @@
 
 ```
 ┌─────────────────────────────────────────────────┐
-│                   SIDE                   │
+│                  PRODUCT ADMIN SIDE             │
 │                                                 │
 │  SUPER_ADMIN      — founder/owner level         │
 │  _ADMIN    — ops team, creates tenants   │
