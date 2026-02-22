@@ -51,7 +51,7 @@
 │                  PRODUCT ADMIN SIDE             │
 │                                                 │
 │  SUPER_ADMIN      — founder/owner level         │
-│  _ADMIN    — ops team, creates tenants   │
+│  PRODUCT_ADMIN    — ops team, creates tenants   │
 │                     and issues licenses         │
 └─────────────────────────────────────────────────┘
 
@@ -69,7 +69,7 @@
 | Role | tenantId in JWS | Scope |
 |---|---|---|
 | SUPER_ADMIN | ❌ None | All tenants |
-| _ADMIN | ❌ None | All tenants |
+| PRODUCT_ADMIN | ❌ None | All tenants |
 | BANK_ADMIN | ✅ Yes | Own tenant only |
 | BANK_USER | ✅ Yes | Own tenant only |
 
@@ -86,7 +86,7 @@ Gateway → Microservice        :  JWS  (signed, HMAC)
 
 ```
 ┌──────────┐        JWE         ┌─────────────┐       JWS        ┌──────────────┐
-│  Client  │ ────────────────▶ │ API Gateway │ ───────────────▶ │ Microservice │
+│  Client  │ ────────────────▶ │ API Gateway │ ───────────────▶  │ Microservice │
 │          │                   │             │                   │              │
 │          │                   │ Decrypt JWE │                   │ Validate JWS │
 │          │                   │ → get JWS   │                   │ → get claims │
